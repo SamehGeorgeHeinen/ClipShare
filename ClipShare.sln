@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipShare", "ClipShare\ClipShare.csproj", "{089D8C91-38AF-4B6B-9240-12E5C1E76493}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{089D8C91-38AF-4B6B-9240-12E5C1E76493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{089D8C91-38AF-4B6B-9240-12E5C1E76493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{089D8C91-38AF-4B6B-9240-12E5C1E76493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{089D8C91-38AF-4B6B-9240-12E5C1E76493}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A331BD7-8A09-454E-98C8-5F57AFB3262C}
+	EndGlobalSection
+EndGlobal
