@@ -1,4 +1,4 @@
-namespace ClipShare.Models
+namespace ClipShare.ViewModels
 {
     public class ErrorViewModel
     {
