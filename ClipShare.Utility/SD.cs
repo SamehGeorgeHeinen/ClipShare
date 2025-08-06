@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-
 namespace ClipShare.Utility
 {
     public static class SD // Changed to static class to fix CS1106
     {
+        public const string AdminRole = "admin";
+        public const string ModeratorRole = "moderator";
+        public const string UserRole = "user";
+        public static readonly List<string> Roles = new List<string> { AdminRole, UserRole, ModeratorRole };
+
         public static string IsActive(this IHtmlHelper html, string controller, string action, string cssClass = "active")
         {
             var routeData = html.ViewContext.RouteData;
