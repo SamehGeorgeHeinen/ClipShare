@@ -1,5 +1,7 @@
 ﻿using ClipShare.Core.Entities;
+using ClipShare.Core.IRepo;
 using ClipShare.DataAccess.Data;
+using ClipShare.DataAccess.Repo;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +23,8 @@ namespace ClipShare.Extensions
 
 
             });
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddSession();
 
             return builder;
         }
