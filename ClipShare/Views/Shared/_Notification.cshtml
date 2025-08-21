@@ -1,4 +1,16 @@
-﻿@if (TempData["notification"] != null)
+﻿﻿<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div id="notificationModalContent" class="modal-content">
+        </div>
+    </div>
+</div>
+
+<button type="button" id="triggerModalButton" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#notificationModal" style="display:none;">
+    Launch demo modal
+</button>
+
+
+@if (TempData["notification"] != null)
 {
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script>
@@ -7,9 +19,19 @@
             let isSuccess = (notificationModel[0] === 'true');
             let title = notificationModel[1];
             let message = notificationModel[2];
+            let type = notificationModel[3];
 
+            displayNotification(isSuccess, title, message, type);
+        });
+    </script>
+}
 
-                  var modalContentInnerHtml =
+<script>
+    function displayNotification(isSuccess, title, message, type = 'modal') {
+        $('#notificationModalContent').empty();
+
+        if (type == 'modal') {
+            var modalContentInnerHtml =
                 `
                 <div class="modal-header ${isSuccess === true ? 'bg-success' : 'bg-danger'}">
                     <h5 class="modal-title" id="modalLabel">${title}</h5>
@@ -24,17 +46,16 @@
 
             $("#notificationModalContent").append(modalContentInnerHtml);
             $("#triggerModalButton").trigger('click');
-        });
-    </script>
-}
+        } else {
+            toastr.options = {
+                positionClass: "toast-bottom-right"
+            };
 
-<button type="button" id="triggerModalButton" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#notificationModal" style="display:none;">
-    Launch demo modal
-</button>
-
-<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" id="notificationModalContent">
-        </div>
-    </div>
-</div>
+            if (isSuccess) {
+                toastr.success(message);
+            } else {
+                toastr.error(message);
+            }
+        }
+    }
+</script>
