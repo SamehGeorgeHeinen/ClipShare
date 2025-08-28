@@ -1,4 +1,6 @@
-﻿using ClipShare.Core.Entities;
+﻿
+using ClipShare.Core.Entities;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +11,8 @@ namespace ClipShare.Core.IRepo
 {
     public interface IVideoRepo : IBaseRepo<Video>
     {
+        Task<int> GetUserIdByVideoIdAsync(int videoId);
+
+
     }
 }

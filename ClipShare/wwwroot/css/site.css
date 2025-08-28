@@ -36,3 +36,7 @@ body {
 .main{
     min-height:550px;
 }
+.preview-image{
+    height:100px;
+    width:200px;
+}
