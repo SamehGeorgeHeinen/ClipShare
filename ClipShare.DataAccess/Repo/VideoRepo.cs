@@ -1,6 +1,9 @@
-﻿using ClipShare.Core.Entities;
+﻿using ClipShare.Core.DTOs;
+using ClipShare.Core.Entities;
 using ClipShare.Core.IRepo;
+using ClipShare.Core.Pagination;
 using ClipShare.DataAccess.Data;
+using ClipShare.Utility;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -26,5 +29,48 @@ namespace ClipShare.DataAccess.Repo
                 .Select(x => x.Channel.AppUserId)
                 .FirstOrDefaultAsync();
         }
+        public async Task<PaginatedList<VideoGridChannelDto>> GetVideosForChannelGridAsync(int channelId, BaseParameters parameters)
+        {
+            var query = _context.Video
+                .Include(x => x.Category)
+                .Where(x => x.ChannelId == channelId)
+                .Select(x => new VideoGridChannelDto
+                {
+                    Id = x.Id,
+                    ThumbnailUrl = x.ThumbnailUrl,
+                    Title = x.Title,
+                    CreatedAt = x.CreatedAt,
+                    CategoryName = x.Category.Name,
+                    Views =SD.GetRandomNumber(1000,50000,x.Id),// x.Viewers.Count(),
+                    Comments = SD.GetRandomNumber(1, 100, x.Id), //x.Comments.Count(),
+                    Likes = SD.GetRandomNumber(10, 100, x.Id), //x.LikeDisLikes.Where(l => l.Liked == true).Count(),
+                    Dislikes = SD.GetRandomNumber(5, 100, x.Id)// x.LikeDisLikes.Where(l => l.Liked == false).Count(),
+                })
+                .AsQueryable();
+
+            // a => ascending
+            // d => descending
+            query = parameters.SortBy switch
+            {
+                "title-a" => query.OrderBy(x => x.Title),
+                "title-d" => query.OrderByDescending(x => x.Title),
+                "date-a" => query.OrderBy(u => u.CreatedAt),
+                "date-d" => query.OrderByDescending(u => u.CreatedAt),
+                /*"views-a" => query.OrderBy(u => u.Views),
+                "views-d" => query.OrderByDescending(u => u.Views),
+                "comments-a" => query.OrderBy(u => u.Comments),
+                "comments-d" => query.OrderByDescending(u => u.Comments),
+                "likes-a" => query.OrderBy(u => u.Likes),
+                "likes-d" => query.OrderByDescending(u => u.Likes),
+                "dislikes-a" => query.OrderBy(u => u.Dislikes),
+                "dislikes-d" => query.OrderByDescending(u => u.Dislikes),*/
+                "category-a" => query.OrderBy(u => u.CategoryName),
+                "category-d" => query.OrderByDescending(u => u.CategoryName),
+                _ => query.OrderByDescending(u => u.CreatedAt)
+            };
+
+            return await PaginatedList<VideoGridChannelDto>.CreateAsync(query.AsNoTracking(), parameters.PageNumber, parameters.PageSize);
+        }
+
     }
 }

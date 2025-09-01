@@ -31,6 +31,13 @@ namespace ClipShare.Utility
             return Convert.ToBase64String(randomNumber);
 
         }
+        public static DateTime GetRandomDate(DateTime minDate, DateTime maxDate, int seed)
+        {
+            Random random = new Random(seed);
+            int range = (maxDate - minDate).Days;
+            return minDate.AddDays(random.Next(range + 1));
+        }
+
 
     }
 }

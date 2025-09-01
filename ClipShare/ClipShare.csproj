@@ -18,4 +18,8 @@
     <ProjectReference Include="..\ClipShare.DataAccess\ClipShare.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Seed\Files\" />
+  </ItemGroup>
+
 </Project>

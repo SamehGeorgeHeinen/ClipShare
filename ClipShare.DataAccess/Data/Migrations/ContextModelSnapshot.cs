@@ -235,19 +235,21 @@ namespace ClipShare.DataAccess.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryID")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ChannelID")
+                    b.Property<int>("ChannelId")
                         .HasColumnType("int");
 
                     b.Property<string>("ContentType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Contents")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -263,11 +265,50 @@ namespace ClipShare.DataAccess.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryID");
+                    b.HasIndex("CategoryId");
 
-                    b.HasIndex("ChannelID");
+                    b.HasIndex("ChannelId");
 
                     b.ToTable("Video");
+                });
+
+            modelBuilder.Entity("ClipShare.Core.Entities.VideoView", b =>
+                {
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VideoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Is_Proxy")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastVisit")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NumberOfVisit")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AppUserId", "VideoId");
+
+                    b.HasIndex("VideoId");
+
+                    b.ToTable("VideoView");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -445,19 +486,38 @@ namespace ClipShare.DataAccess.Data.Migrations
                 {
                     b.HasOne("ClipShare.Core.Entities.Category", "Category")
                         .WithMany("Videos")
-                        .HasForeignKey("CategoryID")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ClipShare.Core.Entities.Channel", "Channel")
                         .WithMany("Videos")
-                        .HasForeignKey("ChannelID")
+                        .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
 
                     b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("ClipShare.Core.Entities.VideoView", b =>
+                {
+                    b.HasOne("ClipShare.Core.Entities.AppUser", "AppUser")
+                        .WithMany("Histories")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClipShare.Core.Entities.Video", "Video")
+                        .WithMany("Viewers")
+                        .HasForeignKey("VideoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -517,6 +577,8 @@ namespace ClipShare.DataAccess.Data.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("Histories");
+
                     b.Navigation("LikeDisLikes");
 
                     b.Navigation("Subscriptions");
@@ -539,6 +601,8 @@ namespace ClipShare.DataAccess.Data.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("LikeDisLikes");
+
+                    b.Navigation("Viewers");
                 });
 #pragma warning restore 612, 618
         }

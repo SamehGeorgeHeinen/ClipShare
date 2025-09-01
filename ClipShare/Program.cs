@@ -1,7 +1,10 @@
 using ClipShare.Core.Entities;
 using ClipShare.DataAccess.Data;
 using ClipShare.Extensions;
+using ClipShare.Seed;
+using ClipShare.Services.IServices;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -45,18 +48,18 @@ async Task InitializeContextAsync()
 {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
+
     try
     {
         var context = scope.ServiceProvider.GetService<Context>();
         var userManager = scope.ServiceProvider.GetService<UserManager<AppUser>>();
         var roleManager = scope.ServiceProvider.GetService<RoleManager<AppRole>>();
-        await  ContextInitializer.InitializeAsync(context,userManager,roleManager);
+        var photoService = scope.ServiceProvider.GetService<IPhotoService>();
+        await ContextInitializer.InitializeAsync(context, userManager, roleManager, photoService);
     }
     catch (Exception ex)
     {
         var logger = services.GetService<ILogger<Program>>();
-        logger.LogError(ex, "an error occured while migrating the database");
-        
-
+        logger.LogError(ex, "An error occured while migrating the databse");
     }
 }

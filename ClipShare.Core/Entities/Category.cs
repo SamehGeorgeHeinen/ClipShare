@@ -14,5 +14,10 @@ namespace ClipShare.Core.Entities
         //Navigation
         
         public ICollection<Video> Videos { get; set; }
+
+        public static implicit operator int(Category v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

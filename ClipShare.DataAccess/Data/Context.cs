@@ -27,6 +27,8 @@ namespace ClipShare.DataAccess.Data
             builder.ApplyConfiguration(new CommentConfig());
             builder.ApplyConfiguration(new SubscribeConfig());
             builder.ApplyConfiguration(new LikeDislikeConfig());
+            builder.ApplyConfiguration(new VideoViewConfig());
+
 
 
         }
