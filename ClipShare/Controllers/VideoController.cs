@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,6 +29,11 @@ namespace ClipShare.Controllers
         {
             _photoService = photoService;
             
+        }
+        public IActionResult Watch(int id)
+        {
+        
+            return View();
         }
         public async Task<IActionResult> CreateEditVideo(int id)
         {
@@ -143,7 +149,9 @@ namespace ClipShare.Controllers
                                 Contents = GetContentsAsync(model.VideoUpload).GetAwaiter().GetResult(),
                                 CategoryId = model.CategoryId,
                             ChannelId = UnitOfWork.ChannelRepo.GetChannelIdByUserId(User.GetUserId()).GetAwaiter().GetResult(),
-                                ThumbnailUrl =_photoService.UploadPhotoLocally(model.ImageUpload)
+                                ThumbnailUrl =_photoService.UploadPhotoLocally(model.ImageUpload),
+                                    CreatedAt = DateTime.UtcNow
+
                         };
 
                         UnitOfWork.VideoRepo.Add(videoToAdd);
