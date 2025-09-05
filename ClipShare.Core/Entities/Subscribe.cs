@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ClipShare.Core.Entities
@@ -10,7 +11,15 @@ namespace ClipShare.Core.Entities
     {
         //PK (AppuserId,ChannelID)
         //FK= AppuserId and  FK=ChannelID
+        public Subscribe()
+        {
 
+        }
+        public Subscribe(int appUserId, int channelId)
+        {
+            AppuserId = appUserId;
+            ChannelID = channelId;
+        }
         public int AppuserId { get; set; }
         public int ChannelID { get; set; }
         //Navigation

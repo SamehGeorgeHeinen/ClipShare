@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ClipShare.DataAccess.Data.Migrations
+namespace ClipShare.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class ModelCreation : Migration
+    public partial class sam : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -228,23 +228,24 @@ namespace ClipShare.DataAccess.Data.Migrations
                     ThumbnailUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Contents = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    CategoryID = table.Column<int>(type: "int", nullable: false),
-                    ChannelID = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    ChannelId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Video", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Video_Category_CategoryID",
-                        column: x => x.CategoryID,
+                        name: "FK_Video_Category_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Video_Channel_ChannelID",
-                        column: x => x.ChannelID,
+                        name: "FK_Video_Channel_ChannelId",
+                        column: x => x.ChannelId,
                         principalTable: "Channel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -296,6 +297,61 @@ namespace ClipShare.DataAccess.Data.Migrations
                     table.ForeignKey(
                         name: "FK_LikeDisLike_Video_VideoID",
                         column: x => x.VideoID,
+                        principalTable: "Video",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VideoFile",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Contents = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VideoId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VideoFile", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VideoFile_Video_VideoId",
+                        column: x => x.VideoId,
+                        principalTable: "Video",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VideoView",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AppUserId = table.Column<int>(type: "int", nullable: false),
+                    VideoId = table.Column<int>(type: "int", nullable: false),
+                    IpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumberOfVisit = table.Column<int>(type: "int", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Is_Proxy = table.Column<bool>(type: "bit", nullable: false),
+                    LastVisit = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VideoView", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VideoView_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VideoView_Video_VideoId",
+                        column: x => x.VideoId,
                         principalTable: "Video",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -362,14 +418,30 @@ namespace ClipShare.DataAccess.Data.Migrations
                 column: "ChannelID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Video_CategoryID",
+                name: "IX_Video_CategoryId",
                 table: "Video",
-                column: "CategoryID");
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Video_ChannelID",
+                name: "IX_Video_ChannelId",
                 table: "Video",
-                column: "ChannelID");
+                column: "ChannelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VideoFile_VideoId",
+                table: "VideoFile",
+                column: "VideoId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VideoView_AppUserId",
+                table: "VideoView",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VideoView_VideoId",
+                table: "VideoView",
+                column: "VideoId");
         }
 
         /// <inheritdoc />
@@ -398,6 +470,12 @@ namespace ClipShare.DataAccess.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Subscribe");
+
+            migrationBuilder.DropTable(
+                name: "VideoFile");
+
+            migrationBuilder.DropTable(
+                name: "VideoView");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

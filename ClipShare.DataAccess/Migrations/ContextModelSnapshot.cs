@@ -4,19 +4,16 @@ using ClipShare.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ClipShare.DataAccess.Data.Migrations
+namespace ClipShare.DataAccess.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250830021159_InitialCreate")]
-    partial class InitialCreate
+    partial class ContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,13 +241,6 @@ namespace ClipShare.DataAccess.Data.Migrations
                     b.Property<int>("ChannelId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ContentType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Contents")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -275,12 +265,46 @@ namespace ClipShare.DataAccess.Data.Migrations
                     b.ToTable("Video");
                 });
 
-            modelBuilder.Entity("ClipShare.Core.Entities.VideoView", b =>
+            modelBuilder.Entity("ClipShare.Core.Entities.VideoFile", b =>
                 {
-                    b.Property<int>("AppUserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Contents")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("VideoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VideoId")
+                        .IsUnique();
+
+                    b.ToTable("VideoFile");
+                });
+
+            modelBuilder.Entity("ClipShare.Core.Entities.VideoView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("City")
@@ -288,9 +312,6 @@ namespace ClipShare.DataAccess.Data.Migrations
 
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
 
                     b.Property<string>("IpAddress")
                         .HasColumnType("nvarchar(max)");
@@ -307,7 +328,12 @@ namespace ClipShare.DataAccess.Data.Migrations
                     b.Property<string>("PostalCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("AppUserId", "VideoId");
+                    b.Property<int>("VideoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("VideoId");
 
@@ -504,6 +530,17 @@ namespace ClipShare.DataAccess.Data.Migrations
                     b.Navigation("Channel");
                 });
 
+            modelBuilder.Entity("ClipShare.Core.Entities.VideoFile", b =>
+                {
+                    b.HasOne("ClipShare.Core.Entities.Video", "Video")
+                        .WithOne("VideoFile")
+                        .HasForeignKey("ClipShare.Core.Entities.VideoFile", "VideoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Video");
+                });
+
             modelBuilder.Entity("ClipShare.Core.Entities.VideoView", b =>
                 {
                     b.HasOne("ClipShare.Core.Entities.AppUser", "AppUser")
@@ -604,6 +641,8 @@ namespace ClipShare.DataAccess.Data.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("LikeDisLikes");
+
+                    b.Navigation("VideoFile");
 
                     b.Navigation("Viewers");
                 });

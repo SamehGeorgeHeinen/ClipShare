@@ -1,0 +1,23 @@
+﻿using ClipShare.Core.Entities;
+using ClipShare.Core.IRepo;
+using ClipShare.DataAccess.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ClipShare.DataAccess.Repo
+{
+    public class VideoFileRepo : BaseRepo<VideoFile>, IVideoFileRepo
+    {
+        public VideoFileRepo(Context context) : base(context)
+        {
+        }
+
+   
+
+    
+    }
+}

@@ -11,7 +11,7 @@ namespace ClipShare.Core.IRepo
         IChannelRepo ChannelRepo { get; }
         ICategoryRepo CategorylRepo { get; }
         IVideoRepo VideoRepo { get; }
-
+        IVideoFileRepo VideoFileRepo { get; }
         Task<bool> CompleteAsync();
     }
 }

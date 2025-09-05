@@ -18,12 +18,16 @@ namespace ClipShare.DataAccess.Data
         public DbSet<Category> Category { get; set; }
         public DbSet<Channel> Channel { get; set; }
         public DbSet<Video> Video { get; set; }
+       
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             //shorter way of applying the manual configuration 
           //  builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+         
+
             builder.ApplyConfiguration(new CommentConfig());
             builder.ApplyConfiguration(new SubscribeConfig());
             builder.ApplyConfiguration(new LikeDislikeConfig());

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,10 +31,54 @@ namespace ClipShare.Controllers
             _photoService = photoService;
             
         }
-        public IActionResult Watch(int id)
+        public async Task<IActionResult> Watch(int id)
         {
-        
-            return View();
+            var UserId = User.GetUserId();
+           var fetchedVideo= await UnitOfWork.VideoRepo.GetFirstOrDefaulAsync(x=>x.Id==id, "Channel.Subscribers,LikeDisLikes");
+            if(fetchedVideo!=null)
+            {
+                var toReturn = new VideoWatch_vm();
+                toReturn.Id = fetchedVideo.Id;
+                toReturn.Title = fetchedVideo.Title;
+                toReturn.Description = fetchedVideo.Description;    
+                toReturn.CreatedAt=fetchedVideo.CreatedAt;
+                toReturn.ChannelId=fetchedVideo.ChannelId;
+                toReturn.ChannelName = fetchedVideo.Channel.Name;
+                toReturn.IsSubscribed = fetchedVideo.Channel.Subscribers.Any(x => x.AppuserId == UserId);
+                toReturn.SubscribersCount =fetchedVideo.Channel.Subscribers.Count();
+                toReturn.ViewersCount = SD.GetRandomNumber(1000, 50000, id);
+                toReturn.LikesCount = fetchedVideo.LikeDisLikes.Where(x=>x.Liked==true).Count();
+                toReturn.IsLiked = fetchedVideo.LikeDisLikes.Any(x => x.AppuserId == UserId && x.Liked==true); 
+                toReturn.IsDisiked = fetchedVideo.LikeDisLikes.Any(x => x.AppuserId == UserId && x.Liked == false);
+                toReturn.DislikesCount = fetchedVideo.LikeDisLikes.Where(x => x.Liked == false).Count();
+                return View(toReturn);
+
+            }
+            TempData["notification"] = "false;Not Found;Requested video was not found";
+            return RedirectToAction("Index", "Home");
+        }
+        public async Task<IActionResult> GetVideoFile(int videoId)
+        {
+            var fetcehdVideoFile = await UnitOfWork.VideoFileRepo.GetFirstOrDefaulAsync(x => x.VideoId == videoId);
+            if (fetcehdVideoFile != null)
+            {
+                return File(fetcehdVideoFile.Contents, fetcehdVideoFile.ContentType);
+            }
+
+            TempData["notification"] = "false;Not Found;Requested video was not found";
+            return RedirectToAction("Index", "Home");
+        }
+        public async Task<IActionResult> DownloadVideoFile(int videoId)
+        {
+            var fetchedVideo = await UnitOfWork.VideoRepo.GetFirstOrDefaulAsync(x => x.Id == videoId, "VideoFile");
+            if (fetchedVideo != null)
+            {
+                string fileDownloadName = fetchedVideo.Title + fetchedVideo.VideoFile.Extension;
+                return File(fetchedVideo.VideoFile.Contents, fetchedVideo.VideoFile.ContentType, fileDownloadName);
+            }
+
+            TempData["notification"] = "false;Not Found;Requested video was not found";
+            return RedirectToAction("Index", "Home");
         }
         public async Task<IActionResult> CreateEditVideo(int id)
         {
@@ -144,10 +189,14 @@ namespace ClipShare.Controllers
                         {
                             Title = model.Title,
                             Description = model.Description,
-                           
+
+                            VideoFile = new VideoFile
+                            {
                                 ContentType = model.VideoUpload.ContentType,
                                 Contents = GetContentsAsync(model.VideoUpload).GetAwaiter().GetResult(),
-                                CategoryId = model.CategoryId,
+                                Extension = SD.GetFileExtension(model.VideoUpload.ContentType)
+                            },
+                            CategoryId = model.CategoryId,
                             ChannelId = UnitOfWork.ChannelRepo.GetChannelIdByUserId(User.GetUserId()).GetAwaiter().GetResult(),
                                 ThumbnailUrl =_photoService.UploadPhotoLocally(model.ImageUpload),
                                     CreatedAt = DateTime.UtcNow
@@ -219,18 +268,18 @@ namespace ClipShare.Controllers
             }
             return Json(new ApiResponse(404, message: "The requested video was not found"));
         }
-       /*
+       
 
         [HttpPut]
         public async Task<IActionResult> SubscribeChannel(int channelId)
         {
-            var channel = await UnitOfWork.ChannelRepo.GetFirstOrDefaultAsync(x => x.Id == channelId, "Subscribers");
+            var channel = await UnitOfWork.ChannelRepo.GetFirstOrDefaulAsync(x => x.Id == channelId, "Subscribers");
 
             if (channel != null)
             {
                 int userId = User.GetUserId();
 
-                var fetchedSubscribe = channel.Subscribers.Where(x => x.ChannelId == channelId && x.AppUserId == userId).FirstOrDefault();
+                var fetchedSubscribe = channel.Subscribers.Where(x => x.ChannelID == channelId && x.AppuserId == userId).FirstOrDefault();
 
                 if (fetchedSubscribe == null)
                 {
@@ -250,16 +299,16 @@ namespace ClipShare.Controllers
 
             return Json(new ApiResponse(404, message: "Channel was not found"));
         }
-
+       
         [HttpPut]
         public async Task<IActionResult> LikeDislikeVideo(int videoId, string action, bool like)
         {
-            var video = await UnitOfWork.VideoRepo.GetFirstOrDefaultAsync(x => x.Id == videoId, "LikeDislikes");
+            var video = await UnitOfWork.VideoRepo.GetFirstOrDefaulAsync(x => x.Id == videoId, "LikeDisLikes");
             if (video != null)
             {
                 int userId = User.GetUserId();
 
-                var fetchedLikeDislike = video.LikeDislikes.Where(x => x.VideoId == videoId && x.AppUserId == userId).FirstOrDefault();
+                var fetchedLikeDislike = video.LikeDisLikes.Where(x => x.VideoID == videoId && x.AppuserId == userId).FirstOrDefault();
                 string clienCommand = "";
 
                 if (action.Equals("like"))
@@ -267,7 +316,7 @@ namespace ClipShare.Controllers
                     if (fetchedLikeDislike == null)
                     {
                         // Adding LikeDislike with value of Like = true
-                        video.LikeDislikes.Add(new LikeDislike(userId, videoId, true));
+                        video.LikeDisLikes.Add(new LikeDisLike(userId, videoId, true));
                         await UnitOfWork.CompleteAsync();
                         clienCommand = "addLike";
                         return Json(new ApiResponse(200, clienCommand));
@@ -285,7 +334,7 @@ namespace ClipShare.Controllers
                         {
                             // User was previously liked the video, and now decided to not to like the video and still not Dislike the video
                             // so remove the LikeDislike from the database
-                            video.LikeDislikes.Remove(fetchedLikeDislike);
+                            video.LikeDisLikes.Remove(fetchedLikeDislike);
                             clienCommand = "removeLike";
                         }
 
@@ -298,7 +347,7 @@ namespace ClipShare.Controllers
                     if (fetchedLikeDislike == null)
                     {
                         // Adding LikeDislike with value of Like = false
-                        video.LikeDislikes.Add(new LikeDislike(userId, videoId, false));
+                        video.LikeDisLikes.Add(new LikeDisLike(userId, videoId, false));
                         await UnitOfWork.CompleteAsync();
                         clienCommand = "addDislike";
                         return Json(new ApiResponse(200, clienCommand));
@@ -316,7 +365,7 @@ namespace ClipShare.Controllers
                         {
                             // User was previously disliked the video, and now decided to not to dislike the video and still not Like the video
                             // so remove the LikeDislike from the database
-                            video.LikeDislikes.Remove(fetchedLikeDislike);
+                            video.LikeDisLikes.Remove(fetchedLikeDislike);
                             clienCommand = "removeDislike";
                         }
 
@@ -331,7 +380,7 @@ namespace ClipShare.Controllers
             }
 
             return Json(new ApiResponse(404, message: "Requested video was not found"));
-        }*/
+        }
         #endregion
 
 

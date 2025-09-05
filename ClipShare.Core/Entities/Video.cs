@@ -17,12 +17,12 @@ namespace ClipShare.Core.Entities
         [Required]
         public string Description { get; set; }
         [Required]
-        public byte[] Contents { get; set; }
+       // public byte[] Contents { get; set; }
         public int CategoryId { get; set; }
         public int ChannelId { get; set; }
-        public DateTime CreatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public string ContentType { get; set; }
+      // public string ContentType { get; set; }
 
 
         // Navigations
@@ -32,7 +32,7 @@ namespace ClipShare.Core.Entities
         [ForeignKey("ChannelId")]
         public Channel Channel { get; set; }
 
-     //   public VideoFile VideoFile { get; set; }
+       public VideoFile VideoFile { get; set; }
 
        public ICollection<Comment> Comments { get; set; }
        public ICollection<LikeDisLike> LikeDisLikes { get; set; }

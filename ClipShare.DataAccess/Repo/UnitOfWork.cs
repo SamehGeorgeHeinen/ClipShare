@@ -22,6 +22,8 @@ namespace ClipShare.DataAccess.Repo
 
         public ICategoryRepo CategorylRepo => new CategoryRepo(_context);
 
+        public IVideoFileRepo VideoFileRepo => new VideoFileRepo(_context);
+
         public async Task<bool> CompleteAsync()
         {
             bool result = false;

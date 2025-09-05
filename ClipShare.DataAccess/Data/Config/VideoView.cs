@@ -13,9 +13,7 @@ namespace ClipShare.DataAccess.Data.Config
     {
         public void Configure(EntityTypeBuilder<VideoView> builder)
         {
-          //  builder.HasKey(x => new { x.Id });
-            //define primary key AppUserId and ChannelId
-            builder.HasKey(c => new { c.AppUserId, c.VideoId });
+            builder.HasKey(x => new { x.Id });
             builder.HasOne(a => a.AppUser).WithMany(c => c.Histories).HasForeignKey(c => c.AppUserId).OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(a => a.Video).WithMany(c => c.Viewers).HasForeignKey(c => c.VideoId).OnDelete(DeleteBehavior.Restrict);
         }
