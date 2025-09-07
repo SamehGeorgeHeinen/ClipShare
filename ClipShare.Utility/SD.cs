@@ -9,6 +9,7 @@ namespace ClipShare.Utility
         public const string UserRole = "user";
         public static readonly List<string> Roles = new List<string> { AdminRole, UserRole, ModeratorRole };
         public const int MB = 1000000;
+        public static readonly List<string> LocalIpAddresses = new List<string> { "127.0.0.1", "::1" };
 
         public static string IsActive(this IHtmlHelper html, string controller, string action, string cssClass = "active")
         {

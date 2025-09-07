@@ -1,6 +1,7 @@
 ﻿using ClipShare.Core.IRepo;
 using ClipShare.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,12 @@ namespace ClipShare.DataAccess.Repo
     public class UnitOfWork : IUnitOfWork
     {
         private readonly Context _context;
-        public UnitOfWork(Context context)
+        private readonly IConfiguration _config;
+
+        public UnitOfWork(Context context,IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
         public IChannelRepo ChannelRepo => new ChannelRepo(_context);
       
@@ -23,6 +27,8 @@ namespace ClipShare.DataAccess.Repo
         public ICategoryRepo CategorylRepo => new CategoryRepo(_context);
 
         public IVideoFileRepo VideoFileRepo => new VideoFileRepo(_context);
+        public ICommentRepo CommentRepo => new CommentRepo(_context);
+        public IVideoViewRepo VideoViewRepo => new VideoViewRepo(_context, _config);
 
         public async Task<bool> CompleteAsync()
         {
