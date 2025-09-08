@@ -288,7 +288,7 @@ namespace ClipShare.Controllers
 
             if (video != null)
             {
-                
+                _photoService.DeletePhotoLocally(video.ThumbnailUrl);
                  UnitOfWork.VideoRepo.Remove(video);
                 await UnitOfWork.CompleteAsync();
 

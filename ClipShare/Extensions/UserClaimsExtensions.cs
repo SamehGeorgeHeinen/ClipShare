@@ -20,5 +20,9 @@ namespace ClipShare.Extensions
         {
             return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
         }
+        public static int GetUserChannelId(this ClaimsPrincipal user)
+        {
+            return int.Parse(user.FindFirst(ClaimTypes.Sid)?.Value);
+        }
     }
 }

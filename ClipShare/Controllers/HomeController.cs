@@ -9,6 +9,7 @@ using ClipShare.ViewModels.Home;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Linq;
@@ -76,16 +77,16 @@ namespace ClipShare.Controllers
             return Json(new ApiResponse(200, result: paginatedResults));
         }
 
-     /*   [Authorize(Roles = $"{SD.UserRole}")]
+      [Authorize(Roles = $"{SD.UserRole}")]
         [HttpGet]
         public async Task<IActionResult> GetSubscriptions()
         {
             var userSubscribedChannels = await Context.Subscribe
-                .Where(x => x.AppUserId == User.GetUserId())
+                .Where(x => x.AppuserId == User.GetUserId())
                 // project the result into an anonymous object
                 .Select(x => new
                 {
-                    Id = x.ChannelId,
+                    Id = x.ChannelID,
                     ChannelName = x.Channel.Name,
                     VideosCount = x.Channel.Videos.Count
                 }).ToListAsync();
@@ -118,11 +119,11 @@ namespace ClipShare.Controllers
         public async Task<IActionResult> GetLikesDislikesVideos(bool liked)
         {
             var userLikedDislikedVideos = await Context.LikeDislike
-                .Where(x => x.AppUserId == User.GetUserId() && x.Liked == liked)
+                .Where(x => x.AppuserId == User.GetUserId() && x.Liked == liked)
                 // project the result into an anonymous object
                 .Select(x => new
                 {
-                    Id = x.VideoId,
+                    Id = x.VideoID,
                     x.Video.Title,
                     x.Video.ThumbnailUrl,
                     ChannelName = x.Video.Channel.Name,
@@ -132,7 +133,7 @@ namespace ClipShare.Controllers
                 }).ToListAsync();
 
             return Json(new ApiResponse(200, result: userLikedDislikedVideos));
-        }*/
+        }
         #endregion
     }
 }
