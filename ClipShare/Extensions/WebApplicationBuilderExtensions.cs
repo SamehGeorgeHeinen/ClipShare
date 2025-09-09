@@ -6,6 +6,7 @@ using ClipShare.Services;
 using ClipShare.Services.IServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Forms.Mapping;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace ClipShare.Extensions
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IPhotoService,PhotoService>();
             builder.Services.AddSession();
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             return builder;
         }

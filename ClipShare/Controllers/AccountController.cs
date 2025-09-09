@@ -65,7 +65,14 @@ namespace ClipShare.Controllers
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid UserName or Password, Please try again");
+                if (result.IsLockedOut)
+                {
+                    ModelState.AddModelError(string.Empty, $"user has been locked,you should wait til {user.LockoutEnd} to log in again");
+
+                }else
+                    
+
+                    ModelState.AddModelError(string.Empty, "Invalid UserName or Password, Please try again");
                 return View(model);
 
             }
