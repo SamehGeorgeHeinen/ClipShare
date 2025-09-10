@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ClipShare.DataAccess.Repo
 {
-    public class VideoRepo : BaseRepo<Video>,IVideoRepo
+    public class VideoRepo : BaseRepo<Video>, IVideoRepo
     {
         private readonly Context _context;
 
@@ -41,7 +41,7 @@ namespace ClipShare.DataAccess.Repo
                     Title = x.Title,
                     CreatedAt = x.CreatedAt,
                     CategoryName = x.Category.Name,
-                    Views =SD.GetRandomNumber(1000,50000,x.Id),// x.Viewers.Count(),
+                    Views = SD.GetRandomNumber(1000, 50000, x.Id),// x.Viewers.Count(),
                     Comments = SD.GetRandomNumber(1, 100, x.Id), //x.Comments.Count(),
                     Likes = SD.GetRandomNumber(10, 100, x.Id), //x.LikeDisLikes.Where(l => l.Liked == true).Count(),
                     Dislikes = SD.GetRandomNumber(5, 100, x.Id)// x.LikeDisLikes.Where(l => l.Liked == false).Count(),
@@ -84,7 +84,7 @@ namespace ClipShare.DataAccess.Repo
                     ChannelName = x.Channel.Name,
                     ChannelId = x.Channel.Id,
                     CategoryId = x.Category.Id,
-                    Views = SD.GetRandomNumber(100,50000,x.Id)
+                    Views = SD.GetRandomNumber(100, 50000, x.Id)
                 })
                 .AsQueryable();
 
@@ -102,5 +102,30 @@ namespace ClipShare.DataAccess.Repo
         }
 
 
+
+        public async Task RemoveVideoAsync(int videoId)
+        {
+            var video = await GetFirstOrDefaulAsync(x => x.Id == videoId, "Comments,LikeDisLikes,Viewers");
+
+            if (video != null)
+            {
+                if (video.Viewers != null)
+                {
+                    _context.VideoView.RemoveRange(video.Viewers);
+                }
+
+                if (video.Comments != null)
+                {
+                    _context.RemoveRange(video.Comments);
+                }
+
+                if (video.LikeDisLikes != null)
+                {
+                    _context.RemoveRange(video.LikeDisLikes);
+                }
+
+                Remove(video);
+            }
+        }
     }
 }

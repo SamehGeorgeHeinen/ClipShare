@@ -18,9 +18,10 @@ namespace ClipShare.DataAccess.Data
         public DbSet<Category> Category { get; set; }
         public DbSet<Channel> Channel { get; set; }
         public DbSet<Video> Video { get; set; }
+        public DbSet<VideoView> VideoView { get; set; }
         public DbSet<Subscribe> Subscribe { get; set; }
         public DbSet<LikeDisLike> LikeDislike { get; set; }
-        public DbSet<VideoView> VideoView { get; set; }
+        public DbSet<Comment> Comment { get; set; }
 
 
 

@@ -2,6 +2,7 @@
 using ClipShare.DataAccess.Data;
 using ClipShare.Services.IServices;
 using ClipShare.Utility;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +17,12 @@ namespace ClipShare.Seed
 {
     public static  class ContextInitializer
     {
+
         
         public static async Task InitializeAsync(Context context
             , UserManager<AppUser> userManager
             , RoleManager<AppRole> roleManager
-            , IPhotoService photoService)
+            , IPhotoService photoService,IWebHostEnvironment webHostEnvironment)
         {
 
 
@@ -107,6 +109,12 @@ namespace ClipShare.Seed
                 context.Category.Add(nature);
 
                 await context.SaveChangesAsync();
+                var folderpath = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                //check if folder exists
+                if(Directory.Exists(folderpath))
+                {
+                    Directory.Delete(folderpath, true);
+                }
                 //add videos and images to database
                 var imageDirectory = new DirectoryInfo("Seed/Files/Thumbnails");
                 var videoDirectory = new DirectoryInfo("Seed/Files/Videos");
@@ -141,9 +149,10 @@ namespace ClipShare.Seed
 
                     };
                     context.Video.Add(videoToAdd);
+                    await context.SaveChangesAsync();
+
                 }
-              
-                await context.SaveChangesAsync();
+
             }
         }
         #region Private Methods

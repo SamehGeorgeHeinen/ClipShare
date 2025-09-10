@@ -319,16 +319,34 @@ namespace ClipShare.Controllers
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var category = await UnitOfWork.CategorylRepo.GetByIdAsync(id);
-            if(category!=null)
+            if (category != null)
             {
+                var categoryVideoIdsAndThumbnailUrls = await Context.Video
+                    .Where(x => x.CategoryId == id)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.ThumbnailUrl
+                    })
+                    .ToListAsync();
+
+                if (categoryVideoIdsAndThumbnailUrls.Any())
+                {
+                    foreach (var video in categoryVideoIdsAndThumbnailUrls)
+                    {
+                        PhotoService.DeletePhotoLocally(video.ThumbnailUrl);
+                        await UnitOfWork.VideoRepo.RemoveVideoAsync(video.Id);
+                        await UnitOfWork.CompleteAsync();
+                    }
+                }
+
                 UnitOfWork.CategorylRepo.Remove(category);
                 await UnitOfWork.CompleteAsync();
-                return Json(new ApiResponse(200,"Deleted","Category of "+ category.Name+"has been removed"));
 
+                return Json(new ApiResponse(200, "Deleted", "Category of " + category.Name + " has been removed"));
             }
-            return Json(new ApiResponse(404, message: "category was not found"));
 
-
+            return Json(new ApiResponse(404, message: "The requested category was not found"));
         }
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(int id)
@@ -345,7 +363,7 @@ namespace ClipShare.Controllers
                     return Json(new ApiResponse(400, message: "Super admin cannot be deleted"));
                 }
 
-               /* if (user.Channel != null)
+                if (user.Channel != null)
                 {
                     var userChannelWithVideos = await Context.Channel
                         .Where(x => x.AppUserId == id)
@@ -364,7 +382,7 @@ namespace ClipShare.Controllers
                         await UnitOfWork.VideoRepo.RemoveVideoAsync(video.Id);
                         await UnitOfWork.CompleteAsync();
                     }
-                }*/
+                }
 
                 var result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
